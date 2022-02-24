@@ -16,13 +16,7 @@ fzf_filter() {
 }
 
 open_url() {
-    if hash xdg-open &>/dev/null; then
-        nohup xdg-open "$@"
-    elif hash open &>/dev/null; then
-        nohup open "$@"
-    elif [[ -n $BROWSER ]]; then
-        nohup "$BROWSER" "$@"
-    fi
+    vi "$@"
 }
 
 
@@ -35,16 +29,9 @@ else
     content="$(tmux capture-pane -J -p -S -"$limit")"
 fi
 
-mapfile -t urls < <(echo "$content" |grep -oE '(https?|ftp|file):/?//[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]')
-mapfile -t wwws < <(echo "$content" |grep -oE '(http?s://)?www\.[a-zA-Z](-?[a-zA-Z0-9])+\.[a-zA-Z]{2,}(/\S+)*' | grep -vE '^https?://' |sed 's/^\(.*\)$/http:\/\/\1/')
-mapfile -t ips  < <(echo "$content" |grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(:[0-9]{1,5})?(/\S+)*' |sed 's/^\(.*\)$/http:\/\/\1/')
-mapfile -t gits < <(echo "$content" |grep -oE '(ssh://)?git@\S*' | sed 's/:/\//g' | sed 's/^\(ssh\/\/\/\)\{0,1\}git@\(.*\)$/https:\/\/\2/')
+mapfile -t paths < <(echo "$content" | grep -oE '(^| )[a-zA-Z_\/-]*(\/[a-zA-Z_\/-]*|\.[a-zA-Z_\/-])($| )' | xargs ) 
 
-if [[ $# -ge 1 && "$1" != '' ]]; then
-    mapfile -t extras < <(echo "$content" |eval "$1")
-fi
-
-items=$(printf '%s\n' "${urls[@]}" "${wwws[@]}" "${ips[@]}" "${gits[@]}" "${extras[@]}" |
+items=$(printf '%s\n' "${paths[@]}" |
     grep -v '^$' |
     sort -u |
     nl -w3 -s '  '
