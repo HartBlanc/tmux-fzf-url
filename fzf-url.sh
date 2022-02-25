@@ -40,7 +40,7 @@ mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{$1=""; print $0}')
 if [ ${#chosen[@]} -ne 0 ]; then
     shopt -s extglob                           # turn on extended glob
     chosen=( "${chosen[@]/#+([[:blank:]])/}" ) # remove leading space/tab from each element
-    tmux send-keys -t "$pane" "vi ${chosen[@]}" Enter
+    tmux send-keys -t "$pane" "$(echo "vi" $(printf "'%s' " "${chosen[@]}"))" Enter
 fi
 
 
