@@ -15,11 +15,6 @@ fzf_filter() {
   eval "fzf-tmux $(get_fzf_options)"
 }
 
-open_url() {
-    vi "$@"
-}
-
-
 limit='screen'
 [[ $# -ge 2 ]] && limit=$2
 
@@ -29,7 +24,7 @@ else
     content="$(tmux capture-pane -J -p -S -"$limit")"
 fi
 
-mapfile -t paths < <(echo "$content" | grep -oE '(^| )[a-zA-Z_\/-]*(\/[a-zA-Z_\/-]*|\.[a-zA-Z_\/-])($| )' | xargs ) 
+mapfile -t paths < <(echo "$content" | python ~/Desktop/tmux-fzf-url/fzf-url.py) 
 
 items=$(printf '%s\n' "${paths[@]}" |
     grep -v '^$' |
@@ -40,6 +35,8 @@ items=$(printf '%s\n' "${paths[@]}" |
 
 mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{print $2}')
 
-for item in "${chosen[@]}"; do
-    open_url "$item" &>"/tmp/tmux-$(id -u)-fzf-url.log"
-done
+if [ ${#chosen[@]} -ne 0 ]; then
+    vi ${chosen[*]}
+fi
+
+
