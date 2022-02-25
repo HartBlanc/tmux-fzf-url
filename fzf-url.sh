@@ -24,7 +24,7 @@ else
     content="$(tmux capture-pane -J -p -S -"$limit")"
 fi
 
-mapfile -t paths < <(echo "$content" | python ~/Desktop/tmux-fzf-url/fzf-url.py) 
+mapfile -t paths < <(echo "$content" | python $(dirname $0)/fzf-url.py) 
 
 items=$(printf '%s\n' "${paths[@]}" |
     grep -v '^$' |
