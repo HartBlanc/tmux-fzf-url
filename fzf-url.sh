@@ -31,7 +31,7 @@ items=$(printf '%s\n' "${paths[@]}" |
     sort -u |
     nl -w3 -s '  '
 )
-[ -z "$items" ] && tmux display 'tmux-fzf-url: no URLs found' && exit
+[ -z "$items" ] && tmux display 'tmux-fzf-url: no Paths found' && exit
 
 mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{$1=""; print $0}')
 
