@@ -33,10 +33,12 @@ items=$(printf '%s\n' "${paths[@]}" |
 )
 [ -z "$items" ] && tmux display 'tmux-fzf-url: no URLs found' && exit
 
-mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{print $2}')
+mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{$1=""; print $0}')
 
 if [ ${#chosen[@]} -ne 0 ]; then
-    vi ${chosen[*]}
+    shopt -s extglob                           # turn on extended glob
+    chosen=( "${chosen[@]/#+([[:blank:]])/}" ) # remove leading space/tab from each element
+    vi "${chosen[@]}"
 fi
 
 
