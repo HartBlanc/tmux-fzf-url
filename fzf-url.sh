@@ -24,14 +24,14 @@ else
     content="$(tmux capture-pane -J -p -S -"$limit")"
 fi
 
-mapfile -t paths < <(echo "$content" | python $(dirname $0)/fzf-url.py) 
+mapfile -t paths < <(echo "$content" | python $(dirname $0)/fzf-url.py $1) 
 
 items=$(printf '%s\n' "${paths[@]}" |
     grep -v '^$' |
     sort -u |
     nl -w3 -s '  '
 )
-[ -z "$items" ] && tmux display 'tmux-fzf-url: no Paths found' && exit
+[ -z "$items" ] && tmux display 'tmux-fzf-url: no paths found' && exit
 
 mapfile -t chosen < <(fzf_filter <<< "$items" | awk '{$1=""; print $0}')
 
